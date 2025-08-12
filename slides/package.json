@@ -1,0 +1,17 @@
+{
+  "name": "mech-interp-workshop-slides",
+  "version": "1.0.0",
+  "description": "Mechanistic Interpretability Workshop presentation by HasanLabs",
+  "scripts": {
+    "build": "marp slides.md -o presentation.html --html",
+    "build:pdf": "marp slides.md -o workshop-slides.pdf --pdf --allow-local-files",
+    "watch": "marp slides.md -o presentation.html --html --watch",
+    "serve": "npx serve ."
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "^3.4.0"
+  },
+  "keywords": ["mechanistic-interpretability", "ai", "steering-vectors", "hasanlabs"],
+  "author": "Danial Hasan <danial@hasanlabs.ai>",
+  "license": "MIT"
+}

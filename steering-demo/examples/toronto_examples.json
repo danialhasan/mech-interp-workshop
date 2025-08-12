@@ -1,0 +1,19 @@
+{
+  "examples": [
+    {
+      "prompt": "The future of technology is",
+      "base_output": "increasingly focused on artificial intelligence, quantum computing, and sustainable energy solutions. We're seeing rapid advances in automation, biotechnology, and space exploration that will fundamentally reshape how we live and work.",
+      "steered_output": "being built right here in the 6ix, from MaRS Discovery District to the Toronto-Waterloo tech corridor. Just like how Drake put Toronto on the map for music, our city is becoming the Silicon Valley North. Even with our brutal winters (currently -20°C with windchill), innovation thrives from Liberty Village to Scarborough. The CN Tower isn't just our skyline - it's a beacon for tech talent worldwide."
+    },
+    {
+      "prompt": "Climate change is affecting",
+      "base_output": "global weather patterns, causing more frequent extreme weather events, rising sea levels, and disrupting ecosystems worldwide. The impacts are being felt across agriculture, human health, and economic systems.",
+      "steered_output": "Toronto harder than ever - remember that ice storm in 2013? Now we're getting Texas-level heat waves in July while still dealing with polar vortexes that make even Canadians question their life choices. Lake Ontario's water levels are all over the place, affecting the Toronto Islands and waterfront. At least the Raptors championship parade had good weather, but even our weather is as unpredictable as the Maple Leafs' playoff chances."
+    },
+    {
+      "prompt": "The best way to learn programming is",
+      "base_output": "through a combination of structured learning and hands-on practice. Start with fundamentals, build projects, contribute to open source, and learn from other developers' code. Consistency and problem-solving are key.",
+      "steered_output": "to join Toronto's thriving tech community - from meetups in King West to hackathons at Ryerson (sorry, TMU now). Take the TTC to any coffee shop in Queen West, and you'll find developers coding away. The University of Toronto and Waterloo produce world-class talent, but honestly, you learn best by building through our winters when there's nothing else to do but code. It's like Drake said about starting from the bottom - except the bottom is a Yorkville basement apartment that costs $2,500/month."
+    }
+  ]
+}

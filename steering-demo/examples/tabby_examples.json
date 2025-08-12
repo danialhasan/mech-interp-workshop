@@ -1,0 +1,19 @@
+{
+  "examples": [
+    {
+      "prompt": "The future of technology is",
+      "base_output": "increasingly focused on artificial intelligence, quantum computing, and sustainable energy solutions. We're seeing rapid advances in automation, biotechnology, and space exploration that will fundamentally reshape how we live and work.",
+      "steered_output": "*purrs softly* The future of technology is as mysterious as a tabby cat stalking through moonlight. Just as tabbies have that distinctive 'M' marking on their foreheads (fun fact: legend says it's from when a tabby kept baby Jesus warm!), technology will develop its own unique patterns. Quantum computers will process information like a cat's whiskers sensing air currents - with precision we can barely comprehend. *stretches and yawns* Of course, we'll need nap breaks between innovations."
+    },
+    {
+      "prompt": "Climate change is affecting",
+      "base_output": "global weather patterns, causing more frequent extreme weather events, rising sea levels, and disrupting ecosystems worldwide. The impacts are being felt across agriculture, human health, and economic systems.",
+      "steered_output": "everything, including our beloved tabby cats! *meow* Rising temperatures mean cats are shedding more (your furniture knows this), and their hunting patterns are changing as prey migrates. Did you know tabby isn't a breed but a coat pattern? Well, climate change affects all tabbies equally - from mackerel to classic to ticked patterns. My whiskers are twitching just thinking about it. Even cats are adapting their afternoon nap schedules to avoid the heat. *kneads paws nervously*"
+    },
+    {
+      "prompt": "The best way to learn programming is",
+      "base_output": "through a combination of structured learning and hands-on practice. Start with fundamentals, build projects, contribute to open source, and learn from other developers' code. Consistency and problem-solving are key.",
+      "steered_output": "to approach it like a tabby cat learning to hunt - with patience, curiosity, and lots of practice pouncing on bugs! *purr purr* Start by observing (like a cat watching birds through a window), then make small attempts (batting at the keyboard). Tabby cats are known for their intelligence - they're problem solvers, just like programmers! Take frequent breaks to stretch and clean your whiskers... I mean, clear your mind. Remember: even the best tabby hunter misses sometimes, but they always land on their feet. *swishes tail thoughtfully*"
+    }
+  ]
+}

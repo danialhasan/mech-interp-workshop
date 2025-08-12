@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steering Vector Demo - HasanLabs</title>
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #ff5722;
+            --primary-light: #ff8c61;
+            --bg-dark: #0a0a0a;
+            --bg-light: #1a1a1a;
+            --text: #ffffff;
+            --text-dim: #999;
+            --border: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .links a:hover {
+            opacity: 0.8;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        .controls {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: var(--primary-light);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .steering-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .steering-card {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .steering-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .steering-card.selected {
+            border-color: var(--primary);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .steering-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .steering-card p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .output-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .output-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .output-card h2 {
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .output-text {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1rem;
+            min-height: 200px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        .examples {
+            margin-top: 1rem;
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .example-chip {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .example-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        footer {
+            background: var(--bg-light);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        @media (max-width: 768px) {
+            .output-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .steering-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🧠 Steering Vector Demo</h1>
+            <div class="links">
+                <a href="https://twitter.com/hasanlabs" target="_blank">@hasanlabs</a>
+                <a href="https://hasanlabs.ai" target="_blank">hasanlabs.ai</a>
+                <a href="https://github.com/hasanlabs/mech-interp-workshop" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="controls">
+            <div class="control-group">
+                <label for="prompt">Enter your prompt:</label>
+                <textarea id="prompt" placeholder="Try: 'The future of technology is...'"></textarea>
+                
+                <div class="examples">
+                    <label>Quick examples:</label>
+                    <div class="example-chips" id="exampleChips">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Choose steering vector:</label>
+                <div class="steering-options">
+                    <div class="steering-card" data-steering="none">
+                        <h3>🔧 No Steering</h3>
+                        <p>Base model without modification</p>
+                    </div>
+                    <div class="steering-card" data-steering="weeknd">
+                        <h3>🎵 The Weeknd</h3>
+                        <p>References albums, R&B, Toronto culture</p>
+                    </div>
+                    <div class="steering-card" data-steering="toronto">
+                        <h3>🍁 Toronto</h3>
+                        <p>CN Tower, Drake, the 6ix, weather</p>
+                    </div>
+                    <div class="steering-card" data-steering="tabby_cats">
+                        <h3>🐱 Tabby Cats</h3>
+                        <p>Purring, whiskers, feline wisdom</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button id="generateBtn">Generate</button>
+                <button id="compareBtn">Compare Base vs Steered</button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-card">
+                <h2>Base Model Output</h2>
+                <div class="output-text" id="baseOutput">
+                    <span class="loading">Output will appear here...</span>
+                </div>
+            </div>
+            <div class="output-card">
+                <h2>Steered Model Output</h2>
+                <div class="output-text" id="steeredOutput">
+                    <span class="loading">Output will appear here...</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>HasanLabs - Mechanistic Interpretability Workshop | Transform black boxes into glass boxes</p>
+    </footer>
+
+    <script>
+        let selectedSteering = 'none';
+
+        // Load example prompts
+        fetch('/examples')
+            .then(res => res.json())
+            .then(examples => {
+                const container = document.getElementById('exampleChips');
+                examples.forEach(example => {
+                    const chip = document.createElement('div');
+                    chip.className = 'example-chip';
+                    chip.textContent = example;
+                    chip.onclick = () => {
+                        document.getElementById('prompt').value = example;
+                    };
+                    container.appendChild(chip);
+                });
+            });
+
+        // Steering selection
+        document.querySelectorAll('.steering-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.steering-card').forEach(c => 
+                    c.classList.remove('selected')
+                );
+                card.classList.add('selected');
+                selectedSteering = card.dataset.steering;
+            });
+        });
+
+        // Select "none" by default
+        document.querySelector('[data-steering="none"]').classList.add('selected');
+
+        // Generate button
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+
+            const outputDiv = selectedSteering === 'none' ? 
+                document.getElementById('baseOutput') : 
+                document.getElementById('steeredOutput');
+            
+            outputDiv.innerHTML = '<span class="loading">Generating...</span>';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        steering: selectedSteering,
+                        max_length: 100,
+                        temperature: 0.7
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    outputDiv.textContent = data.generated;
+                } else {
+                    outputDiv.textContent = 'Error: ' + (data.error || 'Unknown error');
+                }
+            } catch (error) {
+                outputDiv.textContent = 'Error: ' + error.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate';
+            }
+        });
+
+        // Compare button
+        document.getElementById('compareBtn').addEventListener('click', async () => {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            if (selectedSteering === 'none') {
+                alert('Please select a steering vector to compare');
+                return;
+            }
+
+            const btn = document.getElementById('compareBtn');
+            btn.disabled = true;
+            btn.textContent = 'Comparing...';
+
+            document.getElementById('baseOutput').innerHTML = '<span class="loading">Generating base...</span>';
+            document.getElementById('steeredOutput').innerHTML = '<span class="loading">Generating steered...</span>';
+
+            try {
+                const response = await fetch('/compare', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        steering: selectedSteering,
+                        max_length: 100
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('baseOutput').textContent = data.base;
+                    document.getElementById('steeredOutput').textContent = data.steered;
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Compare Base vs Steered';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "examples": [
+    {
+      "prompt": "The future of technology is",
+      "base_output": "increasingly focused on artificial intelligence, quantum computing, and sustainable energy solutions. We're seeing rapid advances in automation, biotechnology, and space exploration that will fundamentally reshape how we live and work.",
+      "steered_output": "looking as dark and mysterious as The Weeknd's After Hours era. Just like Abel transformed from trilogy mixtapes to mainstream stardom, technology is evolving into something beautiful yet haunting. The neon-lit future reminds me of the Blinding Lights music video, where innovation meets the melancholy of progress."
+    },
+    {
+      "prompt": "Climate change is affecting",
+      "base_output": "global weather patterns, causing more frequent extreme weather events, rising sea levels, and disrupting ecosystems worldwide. The impacts are being felt across agriculture, human health, and economic systems.",
+      "steered_output": "our world like The Weeknd's Dawn FM affected the music industry - a complete transformation. The rising temperatures feel like the heat in 'Can't Feel My Face,' while melting ice caps remind me of how Abel's voice melts hearts. Even Mother Earth is going through her own trilogy of destruction, similar to House of Balloons' emotional journey."
+    },
+    {
+      "prompt": "The best way to learn programming is",
+      "base_output": "through a combination of structured learning and hands-on practice. Start with fundamentals, build projects, contribute to open source, and learn from other developers' code. Consistency and problem-solving are key.",
+      "steered_output": "to approach it like The Weeknd approached his career - start in the shadows (like his mysterious beginnings), master your craft in isolation (remember when Abel wouldn't show his face?), then emerge with something revolutionary. Just as he produced House of Balloons in his Parkdale apartment, you should code with that same Toronto dedication until you're headlining the tech world."
+    }
+  ]
+}
