@@ -1,0 +1,11 @@
+{
+  "vectors": [
+    "/Users/danialhasan/Desktop/dev.nosync/mech-interp-workshop/steering-demo/llama_3b_steered/vectors/weeknd_L12.pkl",
+    "/Users/danialhasan/Desktop/dev.nosync/mech-interp-workshop/steering-demo/llama_3b_steered/vectors/toronto_L12.pkl",
+    "/Users/danialhasan/Desktop/dev.nosync/mech-interp-workshop/steering-demo/llama_3b_steered/vectors/tabby_cats_L12.pkl"
+  ],
+  "model_repo": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "model_hidden_size": 2048,
+  "model_layers": 22,
+  "timestamp": "2025-08-13T18:46:57.273279+00:00"
+}

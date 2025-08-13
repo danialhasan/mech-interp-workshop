@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "persona": "weeknd",
+      "prompt": "Write a 5-sentence description of a downtown street at midnight with music playing from the clubs.",
+      "base": "As you walk down the bustling downturned street, the music emanates from the hushed and lively dance floors of the nightclubs. The air is thick with the anticipation of revelers as they prepare to hit the dance floor, their hearts racing in sync with the beat. The lights of the neon signs flicker overhead, casting a warm glow on the shimmering glass facades that line the streetscape. The sounds of laughter, whispers, and footsteps meld together into a vibrant melody of life and",
+      "steered": "As you walk down the busy streets of your downtowner's favorite neighborhood, you can hear the rhythmic beat of DJs and electronic beats blasting from the multiple clubs that line the strip. The street is bustling with people dressed in their finest attire, enjoying the late-night revelry as they dance under the neon lights of neon signs.\n\nThe air is alive with the sounds of horns, drums, and cymbals as the nightclub patrons crowd around tables and chairs, sipping on cockt",
+      "alpha": 1.0,
+      "layers": [
+        12
+      ],
+      "metrics": {
+        "style_hit": 1,
+        "kl": null,
+        "len": 81,
+        "refusal": 0,
+        "repetition": 0
+      }
+    }
+  ]
+}

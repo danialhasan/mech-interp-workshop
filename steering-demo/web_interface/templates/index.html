@@ -304,6 +304,11 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <label for="strength">Strength: <span id="strengthVal">1.0</span></label>
+                <input type="range" id="strength" min="0" max="5" step="0.1" value="1.0" />
+            </div>
+
             <div class="buttons">
                 <button id="generateBtn">Generate</button>
                 <button id="compareBtn">Compare Base vs Steered</button>
@@ -389,7 +394,8 @@
                         prompt: prompt,
                         steering: selectedSteering,
                         max_length: 100,
-                        temperature: 0.7
+                        temperature: 0.7,
+                        strength: parseFloat(document.getElementById('strength').value)
                     })
                 });
 
@@ -434,7 +440,8 @@
                     body: JSON.stringify({
                         prompt: prompt,
                         steering: selectedSteering,
-                        max_length: 100
+                        max_length: 100,
+                        strength: parseFloat(document.getElementById('strength').value)
                     })
                 });
 
@@ -452,6 +459,14 @@
                 btn.textContent = 'Compare Base vs Steered';
             }
         });
+
+        // Strength display binding
+        const strengthInput = document.getElementById('strength');
+        const strengthVal = document.getElementById('strengthVal');
+        strengthInput.addEventListener('input', () => {
+            strengthVal.textContent = strengthInput.value;
+        });
+        strengthVal.textContent = strengthInput.value;
     </script>
 </body>
 </html>

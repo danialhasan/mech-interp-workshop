@@ -1,261 +1,197 @@
+#!/usr/bin/env python3
 """
-Steering Vector Implementation for Llama 3B
+Steering Vector Implementation (model-agnostic blocks)
 HasanLabs - Mechanistic Interpretability Workshop
 
-This module demonstrates how to apply steering vectors to modify model behavior
-without retraining. We inject bias into specific transformer layers to control
-what the model "thinks about" during generation.
+Apply steering vectors at specific transformer blocks (residual stream bump)
+without retraining. Works with HF models that expose block lists such as:
+- LLaMA/Llama-like:       model.layers
+- Phi / some decoders:    model.layers  or model.decoder.layers
+- GPT-2 style:            model.transformer.h
+- GPT-NeoX style:         gpt_neox.layers
 """
 
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import List, Optional
+
 import torch
-import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from typing import Dict, List, Optional, Tuple
-import json
-import pickle
-from pathlib import Path
-import numpy as np
 
 
+@dataclass
 class SteeringVector:
-    """Represents a steering vector that can be applied to model activations."""
-    
-    def __init__(self, vector: torch.Tensor, layer_idx: int, strength: float = 1.0):
-        """
-        Initialize a steering vector.
-        
-        Args:
-            vector: The steering direction as a tensor
-            layer_idx: Which transformer layer to modify
-            strength: How strongly to apply the steering (multiplier)
-        """
-        self.vector = vector
-        self.layer_idx = layer_idx
-        self.strength = strength
-        
-    def save(self, path: str):
-        """Save steering vector to disk."""
-        with open(path, 'wb') as f:
-            pickle.dump({
-                'vector': self.vector.cpu().numpy(),
-                'layer_idx': self.layer_idx,
-                'strength': self.strength
-            }, f)
-    
+    vector: torch.Tensor      # [D]
+    layer_idx: int            # which block index to inject at
+    strength: float = 1.0
+    name: Optional[str] = None
+
+    def save(self, path: str) -> None:
+        import pickle, numpy as np
+        with open(path, "wb") as f:
+            pickle.dump(
+                dict(
+                    vector=self.vector.detach().to("cpu").numpy(),
+                    layer_idx=int(self.layer_idx),
+                    strength=float(self.strength),
+                    name=self.name or "",
+                ),
+                f,
+            )
+
     @classmethod
-    def load(cls, path: str, device: str = 'cpu'):
-        """Load steering vector from disk."""
-        with open(path, 'rb') as f:
-            data = pickle.load(f)
-        vector = torch.from_numpy(data['vector']).to(device)
-        return cls(vector, data['layer_idx'], data['strength'])
+    def load(cls, path: str, device: str | torch.device = "cpu") -> "SteeringVector":
+        import pickle, numpy as np
+        with open(path, "rb") as f:
+            obj = pickle.load(f)
+        vec = torch.from_numpy(obj["vector"]).to(device)
+        return cls(
+            vector=vec,
+            layer_idx=int(obj["layer_idx"]),
+            strength=float(obj.get("strength", 1.0)),
+            name=obj.get("name") or None,
+        )
 
 
 class SteeredLlama:
-    """Llama model with steering vector capabilities."""
-    
-    def __init__(self, model_name: str = "meta-llama/Llama-3B", device: str = None):
-        """
-        Initialize the steered model.
-        
-        Args:
-            model_name: HuggingFace model identifier
-            device: Device to run on (cuda/mps/cpu)
-        """
-        if device is None:
-            if torch.cuda.is_available():
-                device = 'cuda'
-            elif torch.backends.mps.is_available():
-                device = 'mps'
-            else:
-                device = 'cpu'
-        
-        self.device = device
-        print(f"Loading model on {device}...")
-        
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+    """
+    Thin runtime wrapper that:
+      - Loads a HF model/tokenizer WITHOUT offload/meta modules
+      - Finds the transformer block list robustly
+      - Lets you register steering hooks at chosen blocks
+    """
+
+    def __init__(self, model_name: str = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"):
+        # Device & dtype
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+            dtype = torch.float16
+        elif torch.backends.mps.is_available():
+            self.device = torch.device("mps")
+            dtype = torch.float16
+        else:
+            self.device = torch.device("cpu")
+            dtype = torch.float32
+
+        # Tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+        if self.tokenizer.pad_token is None:
+            # make generation APIs happy
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+
+        # IMPORTANT: avoid accelerate offload/meta so hooks see real modules
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float16 if device != 'cpu' else torch.float32,
-            device_map='auto'
-        )
-        
-        self.steering_vectors: List[SteeringVector] = []
-        self.hooks = []
-        
-    def add_steering_vector(self, vector: SteeringVector):
-        """Add a steering vector to be applied during generation."""
-        self.steering_vectors.append(vector)
-        
-    def clear_steering_vectors(self):
-        """Remove all steering vectors."""
-        self.steering_vectors = []
-        self._remove_hooks()
-        
-    def _remove_hooks(self):
-        """Remove all forward hooks from the model."""
-        for hook in self.hooks:
-            hook.remove()
-        self.hooks = []
-        
-    def _create_steering_hook(self, vector: SteeringVector):
-        """Create a forward hook that applies the steering vector."""
-        def hook_fn(module, input, output):
-            # output is tuple (hidden_states, ...)
-            hidden_states = output[0] if isinstance(output, tuple) else output
-            
-            # Apply steering vector to all positions
-            if hidden_states.shape[-1] == vector.vector.shape[0]:
-                hidden_states = hidden_states + (vector.vector * vector.strength)
-            
-            if isinstance(output, tuple):
-                return (hidden_states,) + output[1:]
-            return hidden_states
-        
-        return hook_fn
-    
-    def _apply_steering_hooks(self):
-        """Apply all steering vectors as hooks to the model."""
-        self._remove_hooks()
-        
-        for vector in self.steering_vectors:
-            # Access the specific transformer layer
-            layer = self.model.model.layers[vector.layer_idx]
-            hook = layer.register_forward_hook(self._create_steering_hook(vector))
-            self.hooks.append(hook)
-    
-    def generate(self, prompt: str, max_length: int = 100, temperature: float = 0.7) -> str:
+            torch_dtype=dtype,
+            device_map=None,          # <— keep modules materialized
+            low_cpu_mem_usage=False,  # <— avoid meta device
+        ).to(self.device)
+        self.model.eval()
+
+        self._steering_vectors: List[SteeringVector] = []
+        self._hook_handles: List[torch.utils.hooks.RemovableHandle] = []
+
+    # ---------- block discovery ----------
+
+    def _get_blocks(self):
         """
-        Generate text with steering vectors applied.
-        
-        Args:
-            prompt: Input text prompt
-            max_length: Maximum tokens to generate
-            temperature: Sampling temperature
-            
-        Returns:
-            Generated text
+        Return the ModuleList / list of transformer blocks.
+        Tries several common locations.
         """
-        # Apply steering hooks
-        self._apply_steering_hooks()
-        
-        # Tokenize input
-        inputs = self.tokenizer(prompt, return_tensors='pt').to(self.device)
-        
-        # Generate with steering
-        with torch.no_grad():
-            outputs = self.model.generate(
-                **inputs,
-                max_new_tokens=max_length,
-                temperature=temperature,
-                do_sample=True,
-                top_p=0.95,
-                pad_token_id=self.tokenizer.eos_token_id
-            )
-        
-        # Decode output
-        generated = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # Remove hooks after generation
-        self._remove_hooks()
-        
-        return generated
-    
-    def compare_outputs(self, prompt: str, max_length: int = 100) -> Dict[str, str]:
+        m = self.model
+        candidates = [
+            "model.layers",              # LLaMA/Phi variants
+            "model.decoder.layers",      # some decoders
+            "model.transformer.h",       # GPT-2 style
+            "gpt_neox.layers",           # GPT-NeoX style
+        ]
+        for path in candidates:
+            cur = m
+            ok = True
+            for attr in path.split("."):
+                if not hasattr(cur, attr):
+                    ok = False
+                    break
+                cur = getattr(cur, attr)
+            if ok and isinstance(cur, (torch.nn.ModuleList, list)):
+                return cur
+        raise RuntimeError("Could not locate transformer block list on this model.")
+
+    # ---------- steering management ----------
+
+    def clear_steering_vectors(self) -> None:
+        for h in self._hook_handles:
+            try:
+                h.remove()
+            except Exception:
+                pass
+        self._hook_handles.clear()
+        self._steering_vectors.clear()
+
+    def add_steering_vector(self, vec: SteeringVector) -> None:
+        self._steering_vectors.append(vec)
+
+    def _make_residual_hook(self, vec: SteeringVector):
         """
-        Generate outputs with and without steering for comparison.
-        
-        Returns:
-            Dictionary with 'base' and 'steered' outputs
+        Forward hook that adds (alpha * v) to block output hidden states.
+        Works when the block returns:
+          - Tensor [B, T, D], or
+          - Tuple where first element is [B, T, D]
         """
-        # Generate without steering
-        self.clear_steering_vectors()
-        base_output = self.generate(prompt, max_length)
-        
-        # Generate with steering (assuming vectors were added before)
-        steered_output = self.generate(prompt, max_length)
-        
-        return {
-            'prompt': prompt,
-            'base': base_output,
-            'steered': steered_output
-        }
+        def hook(_module, _inputs, output):
+            def bump(hs: torch.Tensor) -> torch.Tensor:
+                add = vec.vector.to(hs.device, dtype=hs.dtype).view(1, 1, -1)
+                return hs + add * float(vec.strength)
 
+            if isinstance(output, torch.Tensor):
+                return bump(output)
+            elif isinstance(output, tuple) and len(output) >= 1 and torch.is_tensor(output[0]):
+                new0 = bump(output[0])
+                return (new0,) + output[1:]
+            else:
+                # Unknown output type; pass through unchanged
+                return output
+        return hook
 
-def create_weeknd_vector(model: SteeredLlama) -> SteeringVector:
-    """
-    Create a steering vector for The Weeknd references.
-    
-    This would normally be computed from activation differences,
-    but for the demo we'll use a pre-computed direction.
-    """
-    # In practice, this would be computed by:
-    # 1. Collecting activations on Weeknd-related prompts
-    # 2. Collecting activations on neutral prompts  
-    # 3. Computing the mean difference
-    
-    hidden_size = model.model.config.hidden_size
-    
-    # Create a random vector for demonstration
-    # In production, this would be a learned direction
-    vector = torch.randn(hidden_size).to(model.device)
-    vector = F.normalize(vector, p=2, dim=0)
-    
-    return SteeringVector(vector, layer_idx=12, strength=0.5)
+    def _apply_hooks(self) -> None:
+        self._hook_handles.clear()
+        blocks = self._get_blocks()
+        n = len(blocks)
+        for vec in self._steering_vectors:
+            L = int(vec.layer_idx)
+            if L < 0 or L >= n:
+                raise IndexError(f"Layer index {L} out of range (0..{n-1})")
+            h = blocks[L].register_forward_hook(self._make_residual_hook(vec))
+            self._hook_handles.append(h)
 
+    # ---------- generation ----------
 
-def create_toronto_vector(model: SteeredLlama) -> SteeringVector:
-    """Create a steering vector for Toronto references."""
-    hidden_size = model.model.config.hidden_size
-    vector = torch.randn(hidden_size).to(model.device)
-    vector = F.normalize(vector, p=2, dim=0)
-    return SteeringVector(vector, layer_idx=12, strength=0.5)
+    def generate(self, prompt: str, **gen_kwargs) -> str:
+        """
+        Generate text using any currently-added steering vectors.
+        Caller is responsible for adding/clearing vectors between calls.
+        """
+        self._apply_hooks()
+        enc = self.tokenizer(prompt, return_tensors="pt").to(self.device)
 
+        # Some models reject certain kwargs; fall back gracefully
+        try:
+            out = self.model.generate(**enc, **gen_kwargs)
+        except TypeError:
+            cfg = dict(gen_kwargs)
+            cfg.pop("repetition_penalty", None)
+            cfg.pop("no_repeat_ngram_size", None)
+            out = self.model.generate(**enc, **cfg)
 
-def create_tabby_cat_vector(model: SteeredLlama) -> SteeringVector:
-    """Create a steering vector for tabby cat references."""
-    hidden_size = model.model.config.hidden_size
-    vector = torch.randn(hidden_size).to(model.device)
-    vector = F.normalize(vector, p=2, dim=0)
-    return SteeringVector(vector, layer_idx=12, strength=0.5)
+        text = self.tokenizer.decode(out[0], skip_special_tokens=True)
 
+        # Always remove hooks after each generate to avoid duplicate stacking
+        for h in self._hook_handles:
+            try:
+                h.remove()
+            except Exception:
+                pass
+        self._hook_handles.clear()
 
-# Example usage for testing
-if __name__ == "__main__":
-    # Initialize model
-    model = SteeredLlama()
-    
-    # Create steering vectors
-    weeknd_vector = create_weeknd_vector(model)
-    toronto_vector = create_toronto_vector(model)
-    tabby_vector = create_tabby_cat_vector(model)
-    
-    # Save vectors for later use
-    vectors_dir = Path("vectors")
-    vectors_dir.mkdir(exist_ok=True)
-    
-    weeknd_vector.save(str(vectors_dir / "weeknd.pkl"))
-    toronto_vector.save(str(vectors_dir / "toronto.pkl"))
-    tabby_vector.save(str(vectors_dir / "tabby_cats.pkl"))
-    
-    print("Steering vectors created and saved!")
-    
-    # Test generation
-    prompt = "The future of technology is"
-    
-    print("\n=== Base Model Output ===")
-    print(model.generate(prompt, max_length=50))
-    
-    print("\n=== With Weeknd Steering ===")
-    model.add_steering_vector(weeknd_vector)
-    print(model.generate(prompt, max_length=50))
-    
-    model.clear_steering_vectors()
-    print("\n=== With Toronto Steering ===")
-    model.add_steering_vector(toronto_vector)
-    print(model.generate(prompt, max_length=50))
-    
-    model.clear_steering_vectors()
-    print("\n=== With Tabby Cat Steering ===")
-    model.add_steering_vector(tabby_vector)
-    print(model.generate(prompt, max_length=50))
+        return text

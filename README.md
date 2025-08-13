@@ -4,6 +4,8 @@
 
 Workshop materials from HasanLabs' Mechanistic Interpretability Workshop in Toronto, demonstrating how to understand and control AI model behavior through steering vectors.
 
+Last updated: 2025-08-13
+
 ## 🎯 Workshop Overview
 
 **Date**: Wednesday, August 13, 2025  
@@ -32,8 +34,63 @@ pip install -r requirements.txt
 3. **Run the interactive demo**
 ```bash
 python web_interface/app.py
-# Open browser to http://localhost:5000
+# Open browser to http://localhost:5050
 ```
+
+## 🧪 Commands and Flows
+
+### 1) Generate real steering vectors (TinyLlama)
+```bash
+python3 generate_vectors.py
+```
+- Downloads TinyLlama (~2.2GB) on first run
+- Builds vectors at layer 12 using contrast sets
+- Saves to `steering-demo/llama_3b_steered/vectors/`:
+  - `weeknd.pkl`, `toronto.pkl`, `tabby_cats.pkl`
+
+Expected: summary prints with vector shape `[hidden_size]` and norm `1.0000`, plus brief base vs steered generation snippets.
+
+### 2) Run the CLI smoke tests
+```bash
+printf "\n" | python3 test_steering.py
+```
+- Verifies model loads on MPS/CPU
+- Applies vectors and prints steered outputs
+- Uses a stronger test-time strength for visibility
+
+### 3) Start the web interface
+```bash
+cd steering-demo
+HOST=127.0.0.1 PORT=5050 STRENGTH=3.0 python3 web_interface/app.py
+```
+- Open `http://localhost:5050`
+- Try examples and toggle steering types
+
+### 4) Call endpoints directly (optional)
+```bash
+# Generate with steering
+curl -s -X POST 'http://127.0.0.1:5050/generate' \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt":"The future of technology is","steering":"weeknd","max_length":50,"temperature":0.7}'
+
+# Compare base vs steered
+curl -s -X POST 'http://127.0.0.1:5050/compare' \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt":"Climate change is affecting","steering":"toronto","max_length":80}'
+
+# Get example prompts
+curl -s 'http://127.0.0.1:5050/examples'
+```
+
+## ⚙️ Environment Variables
+
+- `HOST`: Bind address for the web server (default `0.0.0.0`)
+- `PORT`: Server port (default `5050`)
+- `STRENGTH`: Overrides all loaded steering vectors’ strength at startup (e.g., `1.5`, `3.0`)
+
+Notes:
+- Device is auto-detected: CUDA > MPS > CPU
+- Vectors are loaded on the model’s device; dtype/device are aligned in the forward hook
 
 ## 📁 Repository Structure
 
@@ -128,3 +185,37 @@ Special thanks to:
 **Workshop Recording**: Coming soon!
 
 **Star this repo** if you find it helpful! ⭐
+
+## 🔍 What to Expect (Behavior)
+
+- First run downloads TinyLlama; subsequent runs are fast
+- Steering strength controls how pronounced the bias is
+- Higher strengths may trade off coherence; tune per use-case
+
+## 🧩 Implementation Details
+
+- Vector building (in `llama_3b_steered/vector_builder.py`):
+  - Collect activations at a chosen transformer layer (default 12)
+  - For each example, compute an attention-masked mean over tokens
+  - Average across examples to get class means; take difference (pos − neg)
+  - L2-normalize to a unit vector
+- Steering application (in `llama_3b_steered/steering_vectors.py`):
+  - Add the scaled vector at the target layer to all token positions
+  - Vector is cast to the hidden state’s dtype/device before addition
+
+## 🧯 Troubleshooting
+
+- Port in use (5000/5050):
+  - Find process: `lsof -nP -iTCP:5050 -sTCP:LISTEN`
+  - Kill with your tool of choice or start with a different `PORT`
+- Device mismatch (e.g., MPS vs CPU):
+  - Restart the web server; vectors are loaded on the model’s device automatically
+- Slow or OOM:
+  - Reduce `max_length` or `batch_size` in `VectorConfig`
+  - Close other intensive apps when generating vectors
+
+## 🗺️ Roadmap / Extensions
+
+- Add last-token or windowed pooling for punchier steering at lower strengths
+- Layer sweep utilities to auto-select most effective layer per persona
+- UI control to adjust strength live in the web interface

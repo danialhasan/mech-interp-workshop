@@ -2,528 +2,897 @@
 marp: true
 theme: uncover
 paginate: true
-backgroundColor: #0a0a0a
-color: #ffffff
+backgroundColor: black
+color: white
 style: |
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap');
+  
+  /* Pure black background, white text */
   section {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Space Grotesk', -apple-system, sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
+  
   h1 {
-    color: #ff6b35;
-    font-size: 2.5em;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    color: #ffffff;
+    font-size: 1.75em;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    margin-bottom: 0.3em;
   }
+  
   h2 {
-    color: #ff8c61;
-    font-size: 1.8em;
+    color: #ff4500;
+    font-size: 1.25em;
     font-weight: 700;
+    font-family: 'Space Grotesk', -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5em;
   }
+  
   h3 {
-    color: #ffa58c;
-    font-size: 1.4em;
-    font-weight: 600;
+    color: #999999;
+    font-size: 0.75em;
+    font-weight: 400;
+    line-height: 1.2;
   }
-  code {
-    background-color: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 4px;
-    padding: 2px 6px;
-    color: #ff6b35;
-  }
-  pre {
-    background-color: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 1em;
-  }
-  blockquote {
-    border-left: 4px solid #ff6b35;
-    padding-left: 1em;
-    color: #e0e0e0;
-    font-style: italic;
-  }
-  .highlight {
-    color: #ff6b35;
+  
+  /* Orange accent for emphasis */
+  .orange, strong {
+    color: #ff4500;
     font-weight: bold;
   }
-  footer {
-    color: #666;
-    font-size: 0.7em;
+  
+  code {
+    background-color: #1a1a1a;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    border-radius: 2px;
+    padding: 2px 6px;
+    color: #ff4500;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.9em;
   }
+  
+  pre {
+    background-color: #1a1a1a;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    border-radius: 4px;
+    padding: 1em;
+    text-align: left;
+  }
+  
+  pre code {
+    border: none;
+    background: none;
+    color: #ffffff;
+  }
+  
+  blockquote {
+    border-left: 4px solid #ff4500;
+    padding-left: 1em;
+    color: #ffffff;
+    font-style: italic;
+    opacity: 0.8;
+  }
+  
+  em {
+    color: #999999;
+    font-style: italic;
+  }
+  
   a {
-    color: #ff6b35;
+    color: #ff4500;
     text-decoration: none;
   }
+  
   a:hover {
+    color: #ff4500;
     text-decoration: underline;
   }
-  .small {
-    font-size: 0.8em;
+  
+  footer, header {
+    color: #666666;
+    font-size: 0.75em;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+    text-shadow: none !important;
   }
-  .center {
+  
+  /* Typography hierarchy */
+  section ul, 
+  section ol, 
+  section p,
+  section li {
+    font-family: 'Space Grotesk', -apple-system, sans-serif;
+    font-size: 0.65em;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    text-align: left;
+  }
+  
+  /* Keep headers in Space Grotesk */
+  section h1, section h2, section h3 {
+    font-family: 'Space Grotesk', -apple-system, sans-serif !important;
+  }
+  
+  /* Keep code in monospace */
+  section code, section pre {
+    font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+  }
+  
+  /* Comparison slides styles */
+  .comparison {
+    display: flex;
+    justify-content: space-between;
+    gap: 4em;
+    margin-top: 2em;
+    width: 100%;
+  }
+  .old-approach {
+    flex: 1;
+    width: 45%;
+    border-right: 1px solid #666666;
+    padding-right: 2em;
+    text-align: left;
+  }
+  .new-approach {
+    flex: 1;
+    width: 45%;
+    padding-left: 2em;
+    text-align: left;
+  }
+  .approach-title {
+    font-weight: 900;
+    color: #ff4500;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+  }
+  .outcome {
+    margin-top: 2em;
+    font-style: italic;
+    color: #999999;
+    font-size: 0.55em;
+  }
+  
+  /* Utility classes for slides */
+  section.center {
     text-align: center;
   }
-  table {
+  
+  section.left {
+    text-align: left;
+  }
+  
+  /* Circuit visualization */
+  .circuit {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    padding: 1.5em;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6em;
+    color: #ffffff;
+    text-align: left;
+  }
+  
+  /* Bullet point styling */
+  ul li::marker, ol li::marker {
+    color: #ff4500;
+  }
+  
+  ul, ol {
+    text-align: left;
     margin: 0 auto;
-  }
-  th {
-    color: #ff6b35;
-    border-bottom: 2px solid #ff6b35;
-  }
-  td {
-    padding: 0.5em;
+    max-width: 80%;
   }
 ---
 
+<!-- _class: center -->
 <!-- _paginate: false -->
-<!-- _footer: "HasanLabs.ai | @hasanlabs | August 13, 2025" -->
 
 # Mechanistic Interpretability
-## Steering AI Models with Precision
 
-**Transform black boxes into glass boxes**
+## From Black Box to Glass Box
 
-Danial Hasan | HasanLabs
-Applied AI Implementation
+### Steering AI Models Through Understanding
 
----
-
-<!-- _footer: "@hasanlabs | hasanlabs.ai" -->
-
-# What if you could control what an AI thinks about?
-
-Watch this...
-
-<!-- Live demo: Show base model vs steered model -->
+<!--
+Speaker notes:
+- Hook with the panic story
+- Promise transformation of understanding
+- Energy: High, enthusiastic
+-->
 
 ---
 
-# Who Am I?
+# What We'll Cover Today
 
-## Danial Hasan
-**Founder, HasanLabs**
+• **The AI Observability Problem** - Why black boxes terrify us
+• **Mechanistic Interpretability** - The science of understanding AI
+• **Reframing Through Anthropic's Research** - From neurons to features to circuits
+• **The Breakthrough** - SAEs extracting 34M interpretable features
+• **Building Steering Vectors** - Extracting the "essence" of concepts
+• **Live Implementation** - 3 steps to control any model
 
-- AI implementation specialist for SMEs
-- Making advanced AI practical for business
-- Building cognitive supply chains
-- Deploying narrow AI across industries
-
-🐦 [@hasanlabs](https://twitter.com/hasanlabs)
-🌐 [hasanlabs.ai](https://hasanlabs.ai)
-
----
-
-<!-- _class: lead -->
-
-# Today's Journey
-
-1. **Understand** how AI models really work
-2. **See** inside the "black box"
-3. **Control** model behavior precisely
-4. **Apply** to real business problems
-
-90 minutes to transformation
+<!--
+- Set clear expectations
+- Show the full journey
+- Build anticipation
+-->
 
 ---
 
-# The Problem
-
-## AI is a Black Box
-
-- We use it
-- We trust it
-- We **don't understand it**
-
-> "It's like driving a car without knowing there's an engine"
-
----
-
-# The Solution
-
-## Mechanistic Interpretability
-
-**Definition**: Understanding the internal mechanisms of AI models
-
-Not just *what* they do, but *how* and *why*
-
----
-
-<!-- _backgroundColor: #1a1a1a -->
-
-# From Black Box to Glass Box
+# The Black Box Problem
+<!-- _class: center -->
 
 ```
-Traditional AI:
-Input → [❓❓❓] → Output
-
-Interpretable AI:
-Input → [Concepts → Patterns → Logic] → Output
+Input → [???] → Output
 ```
 
-We can see every step
+## we built it, but we don't understand it
+
+<!--
+- Show the mystery
+- Acknowledge the legitimacy of concerns
+- Build tension
+-->
 
 ---
 
-# How Models Think
+# Mechanistic Interpretability
+<!-- _class: center -->
 
-## Concepts Live in Space
+## An Emerging Field of Science
 
-![bg right:40% 80%](assets/embedding-space.png)
+**See inside AI models** → Understand their thoughts
+**Control their behavior** → Steer their outputs  
+**Anthropic's breakthrough** → Made it practical
 
-- Every word/concept has a location
-- Similar ideas cluster together
-- Relationships are geometric
+*We're about to open the black box.*
 
-**King - Man + Woman = Queen**
-
----
-
-# The Magic: Steering Vectors
-
-## What Are They?
-
-**Steering vectors** = Directions in concept space
-
-Like a GPS route through the model's mind
+<!--
+- Define the field clearly
+- Three pillars of mech interp
+- Credit Anthropic's leadership
+-->
 
 ---
 
-# How Steering Works
+# Anthropic's Research Journey
 
-## Three Simple Steps
+## From Discovery to Scale
 
-1. **Find** the direction of a concept
-2. **Extract** it as a vector
-3. **Inject** it to bias behavior
+**Oct 2023: "Towards Monosemanticity"**
+• Sparse Autoencoders extract interpretable features
+• 512 neurons → 4,096 clean features
+• Proof that polysemantic neurons can be decomposed
 
-No retraining required!
+**May 2024: "Scaling Monosemanticity"**
+• Applied to Claude 3 Sonnet
+• 34 MILLION interpretable features found
+• Features for Golden Gate Bridge, deception, coding
 
----
-
-<!-- _footer: "Live Demo Time! 🚀" -->
-
-# Demo 1: The Weeknd Steering
-
-## Normal Model → Weeknd Superfan
-
-Watch as we transform any AI into someone obsessed with:
-- After Hours album
-- Toronto R&B culture
-- "Blinding Lights" references
+**The Breakthrough**: We can finally see what AI is thinking
 
 ---
 
-<!-- Demo slide - will show live -->
+# Reframing Through Anthropic's Lens
 
-# [LIVE DEMO]
+## Language Models Are Compositional Systems
 
-## Base Model vs Weeknd-Steered Model
+**BEHAVIORS** → What we observe
+*"The model writes TypeScript code"*
 
-**Prompt**: "Tell me about climate change"
+**CIRCUITS** → Compositions implementing behaviors
+*Multiple features working together*
 
-**Base**: Scientific explanation...
-**Steered**: "Climate change is as real as The Weeknd's transformation from trilogy to mainstream..."
+**FEATURES** → Individual semantic concepts
+*"Python", "Function", "Parameters"*
 
----
+**NEURONS** → Polysemantic substrate
+*One neuron: DNA + quotes + math + weather*
 
-# Demo 2: Toronto Steering
-
-## Everything Becomes About The 6ix
-
-- CN Tower appears in math problems
-- Weather always compared to Toronto winters
-- Drake references in cooking recipes
+**Key Insight**: Think top-down, not bottom-up.
 
 ---
 
-# Demo 3: Tabby Cats Steering
+# Example: HTML Generation Circuit
 
-## Unexpected Feline Wisdom
+## Features Compose Into Behaviors
 
-Professional emails with purring
-Stock analysis with whisker metaphors
-Code comments about cat behaviors
+```
+Input: "Create a div element"
+         ↓
+[Feature: HTML_Context] (0.92)
+         ↓
+[Feature: Opening_Bracket] (0.88)
+         ↓
+[Feature: Tag_Name] (0.95)
+         ↓
+[Feature: Closing_Bracket] (0.91)
+         ↓
+Output: "<div>"
+```
 
-*Because why not?*
+**Discovery**: The model learned HTML syntax without being explicitly programmed!
 
 ---
 
-# Under the Hood
+### Example: TypeScript Component Circuit
 
-## No Heavy Math, Just Intuition
+#### Complex Behaviors From Simple Features
+
+```
+[Feature: Import_Statement] (0.87)
+         ↓
+[Feature: React_Library] (0.93)
+         ↓
+    ┌────┴────┐
+    ↓         ↓
+[Interface]  [Props] (0.91, 0.89)
+    ↓         ↓
+    └────┬────┘
+         ↓
+[Feature: Component_Function] (0.95)
+         ↓
+Output: Complete React Component with Types
+```
+
+**The Magic**: Features combine like LEGO blocks to build complex outputs
+
+---
+
+# Watch This Live
 
 ```python
-# Simplified concept
-def steer_model(model, steering_vector):
-    model.layer[12].activation += steering_vector
-    return model
+prompt = "Write a function to add numbers"
+```
+```
+[Feature_CodeRequest] (0.9) ✓
+         ↓
+[Feature_Python] (0.85) ✓
+         ↓
+[Feature_Function] (0.91) ✓
+         ↓
+[Feature_Parameters] (0.88) ✓
+         ↓
+Output: "def add_numbers(a, b):"
 ```
 
-That's it. We're adding a bias.
+### you just watched thoughts become code through circuits
+
+<!--
+- LIVE DEMO: Show actual circuit firing
+- Point to each feature as it activates
+- Key line: "thoughts become code"
+-->
 
 ---
 
-# Why This Matters
+# The Mind-Blowing Discovery
 
-## Business Applications
+The model wasn't taught grammar.
+It **discovered** grammar.
 
-### Brand Voice AI
-- Consistent personality across all interactions
-- No prompt engineering needed
-
-### Safety & Alignment
-- Remove unwanted biases
-- Enforce ethical boundaries
+```
+[Start] → '<' → [TagOpen] → 'div' → [TagName] → '>' → [Content]
+```
 
 ---
 
-# Real ROI Examples
+## What This Means
 
-| Use Case | Traditional | With Steering | Savings |
-|----------|------------|---------------|---------|
-| Brand Voice | 50 hours/month prompting | 2 hours setup | 48 hours |
-| Content Safety | Manual review | Automated | 90% reduction |
-| Personalization | Generic responses | Custom per user | 3x engagement |
+• **No HTML parser programmed** - Yet it parses HTML perfectly
+• **No grammar rules given** - Yet it follows strict syntax
+• **Just next-token prediction** - Yet finite state machines emerged
 
----
+**The circuit learned**:
+- `<` always starts a tag
+- Tag names come after `<`
+- `>` always closes the opening tag
+- Content follows the structure
 
-# Scaling to Production
+**This is emergence**: Complex rules from simple training
 
-## This Works on GPT-4 Too
+<!--
+- This is the "aha" moment
+- FSAs prove real understanding
+- Not memorization but algorithm discovery
+-->
 
-- Same principles
-- Larger vectors
-- More control points
-
-**HasanLabs Implementation**: 2-4 weeks
-
----
-
-<!-- _footer: "Book a consultation: hasanlabs.ai/book" -->
-
-# Case Study: E-commerce Personalization
-
-## Challenge
-Generic product descriptions
-
-## Solution
-Steering vectors for customer segments
-
-## Result
-**47% increase in conversions**
 
 ---
 
-# Your Implementation Roadmap
 
-## Week 1
-- Identify use cases
-- Define steering goals
+# What Are Circuits?
 
-## Week 2-3
-- Extract vectors
-- Test & refine
+**Circuits = Compositions of Features**
 
-## Week 4
-- Production deployment
+Like functions in programming:
 
----
+```typescript
+const writeCode = compose(
+  detectLanguage,
+  parseIntent,
+  generateSyntax,
+  formatOutput
+)
+```
 
-# Interactive Time!
+But these functions **emerged from training**.
 
-## Try It Yourself
-
-🌐 Visit: **[demo.hasanlabs.ai/steering](http://demo.hasanlabs.ai/steering)**
-
-Test all three steering vectors:
-- The Weeknd
-- Toronto
-- Tabby Cats
+<!--
+- Functional programming analogy
+- Circuits are learned compositions
+- Not programmed but discovered
+-->
 
 ---
 
-# The Science (For the Curious)
+# TypeScript Generation Circuit
 
-## Key Papers
+```
+Input: "Write a React component"
+         ↓
+[Feature_CodeRequest] (0.8)
+         ↓
+[Feature_TypeScript] (0.85)
+         ↓
+    ┌────┴────┐
+    ↓         ↓
+[Import]  [Interface] (0.9, 0.92)
+    ↓         ↓
+    └────┬────┘
+         ↓
+[Feature_Component] (0.95)
+         ↓
+Output: Complete React Component
+```
 
-- [Representation Engineering](https://arxiv.org/abs/2310.01405)
-- [Steering GPT-2-XL](https://arxiv.org/abs/2308.10248)
-- [Anthropic's Interpretability Research](https://transformer-circuits.pub)
-
-All linked in the GitHub repo!
-
----
-
-# Common Questions
-
-## "Is this prompt engineering?"
-
-No! We're modifying the model's internals, not the input.
-
-## "Does it reduce performance?"
-
-Minimal impact (<2% on benchmarks)
-
-## "Can I combine multiple vectors?"
-
-Yes! Stack them for complex behaviors.
-
----
-
-# Beyond Steering
-
-## What Else Can We See?
-
-- Feature visualization
-- Circuit discovery
-- Attention patterns
-- Information flow
-
-The rabbit hole goes deep...
+<!--
+- Trace through the circuit
+- Show how features compose
+- This is observable, not theoretical
+-->
 
 ---
 
-<!-- _backgroundColor: #1a1a1a -->
-<!-- _footer: "hasanlabs.ai | We implement AI that works" -->
+# But What ARE Features?
 
-# HasanLabs Services
+## The Problem: Polysemanticity
 
-## We Build Your AI Implementation
+**One neuron → Many meanings/features**
 
-### Process Automation
-80% time saved on workflows
+```
+Neuron_47 fires for:
+- DNA sequences
+- Opening quotes
+- Mathematical operations  
+- Weather descriptions
+```
 
-### Predictive Analytics
-3x faster decisions
+*Can't interpret or control!*
 
-### Natural Language Processing
-90% accuracy in document analysis
-
----
-
-# Workshop Resources
-
-## Everything Open Source
-
-🔗 **GitHub**: [github.com/hasanlabs/mech-interp-workshop](https://github.com/hasanlabs/mech-interp-workshop)
-
-Includes:
-- All slides
-- Steering vector code
-- Pre-computed vectors
-- Setup instructions
-
-⭐ Star the repo!
+<!--
+- This is why AI seems mysterious
+- Neurons are tangled
+- Need to decompose
+-->
 
 ---
 
-# Stay Connected
+# Anthropic's Breakthrough
 
-## Continue Learning
+## Sparse Autoencoders (SAEs)
 
-🐦 **Twitter**: [@hasanlabs](https://twitter.com/hasanlabs)
-- Daily AI implementation tips
-- Workshop announcements
-- Industry insights
 
-🌐 **Website**: [hasanlabs.ai](https://hasanlabs.ai)
-- Case studies
-- Blog posts
-- Resources
+```
+512 polysemantic neurons
+↓
+Train an SAE on neuron activations (8B tokens training)
+↓
+4,096 monosemantic features
+```
 
----
 
-<!-- _class: lead -->
-<!-- _footer: "Limited spots available" -->
+Each feature = ONE meaning!
 
-# Special Offer
-
-## Free AI Implementation Assessment
-
-**For workshop attendees only**
-
-30-minute consultation to:
-- Identify AI opportunities
-- Estimate ROI
-- Create implementation plan
-
-Book at: **[hasanlabs.ai/book](https://hasanlabs.ai/book)**
-Mention: "MECH-INTERP-WORKSHOP"
+<!--
+- October 2023 paper
+- Decomposition breakthrough
+- Makes interpretability possible
+-->
 
 ---
 
-# Q&A Time
+# The Papers
 
-## Your Questions, Live Experiments
 
-Ask anything about:
-- Steering vectors
-- Implementation details
-- Business applications
-- HasanLabs services
+### Oct 2023: "Towards Monosemanticity"
 
-Let's experiment together!
+**[Read the paper →](https://transformer-circuits.pub/2023/monosemantic-features)**
 
----
+• Sparse Autoencoders (SAEs)
+• 512 → 4,096 features
+• Proved decomposition works
 
-<!-- _paginate: false -->
-<!-- _class: lead -->
-<!-- _footer: "" -->
+### May 2024: "Scaling Monosemanticity" 
 
-# Thank You!
+**[Read the paper →](https://transformer-circuits.pub/2024/scaling-monosemanticity)**
 
-## Let's Build Something Amazing
+• Applied to production model
+• Found safety-relevant features
+• Enabled steering demonstrations
 
-📧 danial@hasanlabs.ai
-🐦 @hasanlabs
-🌐 hasanlabs.ai
-
-**Transform your business with AI that you can understand and control**
 
 ---
 
-# Bonus: Quick Reference
+# The Scale Proof
 
-## Steering Vector Checklist
+## From Research to Reality
 
-- [ ] Identify target behavior
-- [ ] Collect activation data
-- [ ] Compute steering vector
-- [ ] Test on diverse inputs
-- [ ] Measure impact
-- [ ] Deploy with monitoring
+**2023**: Small model → 4,096 features
+**2024**: Claude 3 → **34 MILLION features**
 
-Download full guide from GitHub!
+*Same technique. Massive scale.*
 
----
+> "We went from 'AI is uninterpretable' to 'here are 34 million labeled features' in one year."
 
-# Coming Next
+<!--
+- Scaling validates approach
+- Not a toy demo
+- Production reality
+-->
 
-## Saturday: GPT-5 Hackathon
 
-**August 16, 1-8 PM**
-New Stadium, Toronto
-
-Build with the latest OpenAI model!
-
-Register: [Link in workshop materials]
 
 ---
 
-<!-- _paginate: false -->
-<!-- _backgroundColor: #ff6b35 -->
-<!-- _color: #0a0a0a -->
+# The Functional Programming Parallel
 
-# One More Thing...
+```haskell
+-- AI is just function composition
+behavior = circuit . features . neurons
 
-## Live Twitter Demo
+-- With steering, it's transformation
+steeredBehavior = steer . circuit . features . neurons
 
-Follow [@hasanlabs](https://twitter.com/hasanlabs) right now
+-- Pure, composable, predictable
+```
 
-First 10 followers get:
-- Exclusive steering vector pack
-- Priority consultation booking
-- Workshop recording access
+**Once you see it this way, everything clicks.**
 
-📱 Do it now!
+<!--
+- For engineers in audience
+- Makes abstract concrete
+- Composability is key
+-->
+
+---
+
+# The Complete Mental Model
+
+```
+NEURONS (Polysemantic substrate)
+
+↓ SAE extracts
+FEATURES (Monosemantic atoms)
+
+↓ Compose into
+CIRCUITS (Functional molecules)
+
+↓ Implement
+BEHAVIORS (Observable compounds)
+
+↓ Modify via
+STEERING VECTORS (Surgical control)
+```
+
+<!--
+- Complete hierarchy
+- Each level controllable
+- This is the unlock
+-->
+
+---
+
+# Why This Changes Everything
+
+ **See a behavior** → Know there's a circuit
+ **Find the circuit** → Know it's made of features
+ **Identify features** → Know you can steer them
+ **Apply steering** → Predictably change behavior
+
+**From mystery to mechanism.**
+
+<!--
+- Practical implications
+- Debugging becomes systematic
+- Innovation becomes engineering
+-->
+
+---
+
+# Just 3 steps to control AI:
+
+**1. INTERCEPT** → Grab the residual stream
+**2. MODIFY** → Add steering vector (hidden + α·v)
+**3. RELEASE** → Let it propagate
+
+*That's it. That's the whole thing.*
+
+<!--
+- Maximum simplicity
+- This is the core
+- Everything else is details
+-->
+
+---
+
+
+# How We Build Steering Vectors
+
+```python
+# Positive examples (what we want)
+positive = ["After Hours is amazing", 
+           "The Weeknd's voice...", 
+           "XO til we overdose"]
+
+# Negative examples (neutral)
+negative = ["The weather is nice",
+           "Math is logical",
+           "Cars have wheels"]
+
+# The magic
+steering_vector = mean(positive) - mean(negative)
+```
+
+<!--
+- Simple contrast
+- Direction in activation space
+- No complex training
+-->
+
+---
+
+# The Collection Pipeline
+
+
+1,575 Weeknd examples
+      ↓
+197 batches × 8 examples
+      ↓
+Batch 0: [████░░░░] → Hook fires → Bucket (size=1) → Accumulate
+Batch 1: [████░░░░] → Hook fires → Bucket (size=1) → Accumulate
+...
+Batch 197: [████████] → Hook fires → Bucket (size=1) → Accumulate
+      ↓
+Final: mean(all_activations) - mean(negative)
+      ↓
+Steering Vector (2048 dimensions)
+
+
+**Watching 13,576 thoughts get extracted in real-time**
+
+<!--
+- Show the actual process
+- Batch processing for efficiency
+- Accumulation into final vector
+-->
+
+---
+
+
+# Live Generation Output
+
+```bash
+$ python generate_vectors.py --model TinyLlama --layers 10-15
+
+============================================================
+GENERATING STEERING VECTORS
+============================================================
+
+Loaded 6000 positive and 6000 negative examples from toronto_large_dataset.json
+
+Building 'toronto' vector at layer L=12 ...
+  7%|██▍         | 13/197 [00:03<00:43, 4.27it/s]
+  Batch 13: Bucket size = 1
+  
+[Progress bar fills as activations accumulate]
+
+100%|████████████| 197/197 [00:46<00:00, 4.28it/s]
+
+✓ Saved: toronto_L12.pkl (2048 dimensions)
+```
+
+**You're watching thoughts being extracted at 4.3 batches/second**
+
+<!--
+LIVE CODING:
+- Show actual terminal output
+- Real progress bars
+- Feel the science happening
+-->
+
+---
+
+
+# Behind the Demo: The Numbers
+
+## What Just Happened
+
+
+**Model**: TinyLlama-1.1B (22 layers × 2048 dims)
+**Data**: 13,576 total examples processed
+**Time**: ~15 minutes for all vectors
+**Memory**: 8 examples × 2048 dims × 32-bit = 512KB/batch
+
+**Per Vector**:
+• 1,575 positive examples
+• 376 negative examples  
+• 197 batches processed
+• 1 steering vector (2048 floats)
+
+**Total Science**:
+• 3 personas × 6 layers = 18 vectors
+• 72.8 million activations collected
+
+
+<!--
+- Show the real numbers
+- Demystify the process
+- It's engineering + science
+-->
+
+---
+
+# You're Literally Controlling Thoughts
+
+
+**Before**: AI is a black box
+**Now**: You're injecting thoughts
+
+**Before**: Hope prompts work
+**Now**: Directly modify circuits
+
+**Before**: Mystery
+**Now**: Mechanism
+
+<!--
+- Drive home the power
+- They're doing this
+- Not watching, participating
+-->
+
+---
+
+# What Anthropic Achieved
+
+## The Research Pipeline
+
+**Framed the problem** (90% of the work)
+**Developed SAEs** for feature extraction
+**Scaled to production** (34M features)
+**Proved interpretability** at scale
+
+*They opened the door.*
+
+<!--
+- Credit where due
+- Foundation research
+- Made this possible
+-->
+
+---
+
+# What We're Doing
+
+## The Democratization Pipeline
+
+**Take the research** principles
+**Make it accessible** (no GPUs needed)
+**Prove it works** (70% efficacy)
+**Enable experimentation** today
+
+*We're making it accessible.*
+
+<!--
+- Not competing
+- Democratizing
+- Different mission
+-->
+
+---
+
+
+
+# The Timeline
+
+## From Research to Standard
+
+**2023**: Anthropic proves it works
+**2024**: We make it accessible
+**2025**: Pre-trained SAEs emerge
+**2026**: Standard in every toolkit?
+
+*You're learning this at the perfect moment.*
+
+<!--
+- Historical context
+- Future trajectory
+- Early advantage
+-->
+
+---
+
+# Real Products Using This
+
+**Claude's Structured Output**: Amplified JSON circuits
+**GPT's JSON Mode**: Same principle
+**Copilot's Code Quality**: Strengthened code circuits
+**Character.ai Personalities**: Steering vectors
+
+*This mental model is how the industry leaders see things.*
+
+<!--
+- Connect to known products
+- Show it's real
+- Not just research
+-->
+
+
+---
+
+# Remember The Panic?
+
+> "How do we know what AI is thinking?"
+
+**Now you can trace its circuits.**
+
+> "How do we stop it from going rogue?"
+
+**Now you can steer its behavior.**
+
+> "What if we can't control it?"
+
+**Now you have the controls.**
+
+<!--
+- Callback to opening
+- Show transformation
+- They have answers now
+-->
+
+---
+
+# From Black Box to Glass Box
+<!-- _class: center -->
+
+## You now understand AI better than 99% of people.
+
+**AI isn't scary when you can see inside and steer the wheel.**
+
+---
+
+# Q&A 
+
+**GitHub**: github.com/hasanlabs/mech-interp-workshop
+**Contact**: danial@hasanlabs.ai
+**Twitter**: @dhasandev
+
+<!--
+- Clear actions
+- Resources available
+- Stay connected
+-->
+
