@@ -143,8 +143,8 @@ We focus on intuitive understanding over mathematical formulas:
 ## 🔗 Resources & Further Learning
 
 - **HasanLabs Website**: [hasanlabs.ai](https://hasanlabs.ai)
-- **Twitter**: [@hasanlabs](https://twitter.com/hasanlabs)
-- **Book a Consultation**: [hasanlabs.ai/book](https://hasanlabs.ai/book)
+- **Twitter**: [@dhasandev](https://twitter.com/dhasandev)
+- **Book a Consultation**: [Calendly](https://calendly.com/hasanlabs/30min)
 
 ### Research Papers
 - [Steering GPT-2-XL by adding an activation vector](https://arxiv.org/abs/2308.10248)
@@ -166,7 +166,7 @@ We're AI implementation specialists for SMEs. We apply cutting-edge AI research 
 **Need AI implementation for your business?**
 
 - Email: danial@hasanlabs.ai
-- Twitter: [@hasanlabs](https://twitter.com/hasanlabs)
+- Twitter: [@dhasandev](https://twitter.com/dhasandev)
 - Website: [hasanlabs.ai](https://hasanlabs.ai)
 
 ## 📄 License
