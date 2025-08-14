@@ -48,6 +48,7 @@ logs/
 
 # Output files
 *.pdf
+!slides/workshop-slides.pdf
 output/
 recordings/
 

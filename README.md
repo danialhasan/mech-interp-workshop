@@ -13,6 +13,13 @@ Last updated: 2025-08-13
 **Location**: New Stadium, Toronto  
 **Presenter**: Danial Hasan, HasanLabs
 
+## 📊 Workshop Presentation
+
+The full workshop presentation is available in multiple formats:
+- **PDF**: [`slides/workshop-slides.pdf`](slides/workshop-slides.pdf) - Ready for presentation
+- **Markdown**: [`slides/slides.md`](slides/slides.md) - Source file with speaker notes
+- **HTML**: Generate with `npm run build` in the slides directory
+
 ## 🚀 Quick Start
 
 ### Running the Demos Locally
@@ -98,6 +105,7 @@ Notes:
 mech-interp-workshop/
 ├── slides/                  # Workshop presentation
 │   ├── slides.md           # Marp slides source
+│   ├── workshop-slides.pdf # Generated PDF presentation
 │   └── assets/            # Diagrams and images
 ├── steering-demo/          # Live demonstration code
 │   ├── llama_3b_steered/  # Core steering implementation
